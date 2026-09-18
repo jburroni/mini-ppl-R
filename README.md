@@ -1,5 +1,17 @@
 # MiniPPL in native R syntax
 
+## About this implementation
+
+As a final project for my **Introduction to Probabilistic Programming Languages** course at the University of Buenos Aires (UBA), in June 2026, students were asked to rewrite the small probabilistic programming language developed in class using a programming language—and preferably a programming style—of their choice. The assignment can be found [here](https://jburroni.github.io/teaching/ppl-2026/).
+
+Ezequiel Birman later pointed out that none of the groups had chosen **R**, despite R being a particularly interesting language for this exercise. Besides its obvious connection to statistics, R has several unusual language features that are relevant to interpreter design: lazy evaluation through promises, first-class environments and lexical closures, and extensive facilities for metaprogramming and non-standard evaluation.
+
+So I asked GPT to produce an R implementation, with an additional constraint: it should not merely translate the existing interpreter into R, but should take advantage of these distinctive features of the language and try to make the result *idiomatically R*. In particular, the implementation uses R's native syntax trees and `substitute()` instead of writing a parser, environments and native closures for lexical scope, promises and selective forcing where appropriate, and a small continuation-based layer for probabilistic effects.
+
+Here it is.
+
+---
+
 This is a self-contained base-R translation of the MiniPPL used in the June 26 material. It keeps the original source-language constructs and message interface, but it does not make R impersonate a Lisp with hand-built `list()` syntax.
 
 A model is written as ordinary R code inside `ppl(...)`:
