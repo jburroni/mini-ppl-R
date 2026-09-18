@@ -200,3 +200,53 @@ To stay at the size of the original language:
 - `runtime.R` — CPS compiler, continuation runtime, and inference controllers.
 - `examples.R` — closure, recursion, conjugacy, and exact-enumeration examples.
 - `tests.R` — executable semantic and numerical checks.
+
+## Additional examples
+
+A Bayesian network in which latent values steer control flow. Every sample site is Bernoulli, so enumeration is exact:
+
+```r
+sprinkler <- ppl({
+  rain      ~ bernoulli(0.2)
+  sprinkler ~ bernoulli(if (rain) 0.01 else 0.4)
+  p_wet <- if (sprinkler && rain) 0.99
+           else if (sprinkler) 0.9
+           else if (rain) 0.8
+           else 0.0
+  observe(TRUE ~ bernoulli(p_wet))
+  rain
+})
+
+posterior_table(enumerate_traces(sprinkler))$table   # P(rain | wet) = 0.3577
+```
+
+Single-site MH mixes slowly on this model. The state with neither rain nor sprinkler has zero likelihood, so a proposal that flips `rain` alone is always rejected.
+
+A beta-Bernoulli coin that folds `observe` over a persistent vector by recursion:
+
+```r
+coin <- ppl({
+  observe_all <- function(p, xs) {
+    if (`empty?`(xs)) p
+    else {
+      observe(first(xs) ~ bernoulli(p))
+      observe_all(p, rest(xs))
+    }
+  }
+  p ~ beta(2, 2)
+  observe_all(p, c(1, 1, 0, 1, 1, 1, 0, 1, 1, 1))
+})
+
+mean(smc(coin, N = 5000, seed = 4))                  # posterior mean is 10/14
+```
+
+Driving the message interface by hand. An `observe` step exposes its continuation as `resume`:
+
+```r
+step <- initial_step(sprinkler)
+while (step$tag != "done") {
+  cat(step$tag, address_key(step$address), "\n")
+  step <- if (step$tag == "sample") step$k(TRUE) else step$resume()
+}
+step$value
+```
