@@ -2,7 +2,7 @@
 
 ## About this implementation
 
-As a final project for my **Introduction to Probabilistic Programming Languages** course at the University of Buenos Aires (UBA), in June 2026, students were asked to rewrite the small probabilistic programming language developed in class using a programming language—and preferably a programming style—of their choice. The assignment can be found [here](https://jburroni.github.io/teaching/ppl-2026/).
+As a final project for my **Introduction to Probabilistic Programming Languages** course at the University of Buenos Aires (UBA) in June 2026, students were asked to rewrite the small probabilistic programming language developed in class using a programming language and, preferably, a programming style—of their choice. The assignment can be found [here](https://jburroni.github.io/teaching/ppl-2026/).
 
 Ezequiel Birman later pointed out that none of the groups had chosen **R**, despite R being a particularly interesting language for this exercise. Besides its obvious connection to statistics, R has several unusual language features that are relevant to interpreter design: lazy evaluation through promises, first-class environments and lexical closures, and extensive facilities for metaprogramming and non-standard evaluation.
 
@@ -85,7 +85,7 @@ lexical <- ppl({
 })
 ```
 
-## Why call-by-need helps—but is not the continuation
+## Why call-by-need helps
 
 R promises are excellent for capturing syntax and controlling when source fragments are inspected. They are not enough to implement a probabilistic effect. A promise means “compute this expression later”; at a sample site the controller needs “continue the rest of the program with the value I choose.”
 
@@ -186,7 +186,7 @@ To stay at the size of the original language:
 
 - there is no custom parser;
 - there is no escape to arbitrary host R evaluation;
-- source functions have positional parameters only—no defaults, `...`, or named calls;
+- source functions have positional parameters only: no defaults, `...`, or named calls;
 - assignment is lexical binding, not mutable state;
 - `x ~ d` is allowed only as a statement, and `observe(y ~ d)` is only syntax for the ordinary two-argument `observe`;
 - exact enumeration supports Bernoulli sample sites only.
